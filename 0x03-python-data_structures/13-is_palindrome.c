@@ -1,54 +1,72 @@
 #include "lists.h"
 
-/**
-* list_len - finds no. of elements ina linked list.
-* @h: pointer to linked list.
-*
-* Return: number of elements in linked list.
-*/
-size_t list_len(listint_t *h)
-{
-	size_t  nodes = 0;
+listint_t *reverse_listint(listint_t **head);
+int is_palindrome(listint_t **head);
 
-	if (h == NULL)
-		return (0);
-	while (h != NULL)
+/**
+ * reverse_listint - Reverses a singly-linked listint_t list.
+ * @head: A pointer to the starting node of the list to reverse.
+ *
+ * Return: A pointer to the head of the reversed list.
+ */
+listint_t *reverse_listint(listint_t **head)
+{
+	listint_t *node = *head, *next, *prev = NULL;
+
+	while (node)
 	{
-		nodes++;
-		h = h->next;
+		next = node->next;
+		node->next = prev;
+		prev = node;
+		node = next;
 	}
-	return (nodes);
+
+	*head = prev;
+	return (*head);
 }
 
 /**
-* is_palindrome - checks if a singly linked list is a palindrome.
-* @head: double pointert to head of d-list.
-*
-* Return: 1 if palindrome, 0 otherwise.
-*/
+ * is_palindrome - Checks if a singly linked list is a palindrome.
+ * @head: A pointer to the head of the linked list.
+ *
+ * Return: If the linked list is not a palindrome - 0.
+ *         If the linked list is a palindrome - 1.
+ */
 int is_palindrome(listint_t **head)
 {
-	int *nArr, i = 0, j = 0, len = 0;
-	listint_t *temp;
+	listint_t *tmp, *rev, *mid;
+	size_t size = 0, i;
 
-	if (*head == NULL)
+	if (*head == NULL || (*head)->next == NULL)
 		return (1);
-	temp = *head;
-	len = list_len(temp);
-	nArr = (int *)malloc(sizeof(int) * len);
-	if (nArr == NULL)
-		return (2);
-	temp = *head;
-	while (temp != NULL)
+
+	tmp = *head;
+	while (tmp)
 	{
-		nArr[j] = temp->n;
-		j++;
-		temp = temp->next;
+		size++;
+		tmp = tmp->next;
 	}
-	for (i = 0, j = len - 1; i < j; i++, j--)
+
+	tmp = *head;
+	for (i = 0; i < (size / 2) - 1; i++)
+		tmp = tmp->next;
+
+	if ((size % 2) == 0 && tmp->n != tmp->next->n)
+		return (0);
+
+	tmp = tmp->next->next;
+	rev = reverse_listint(&tmp);
+	mid = rev;
+
+	tmp = *head;
+	while (rev)
 	{
-		if (nArr[i] != nArr[j])
+		if (tmp->n != rev->n)
 			return (0);
+		tmp = tmp->next;
+		rev = rev->next;
 	}
+	reverse_listint(&mid);
+
 	return (1);
 }
