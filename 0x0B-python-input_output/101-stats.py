@@ -1,18 +1,42 @@
 #!/usr/bin/python3
 """
-function that inserts a line of text to a file, after each line containing a specific string
+Module for log parsing scripts.
 """
 
 
-def append_after(filename="", search_string="", new_string=""):
-    '''module Search and update
-    '''
-    with open(filename, 'r+') as f:
-        lines = f.readlines()
-        i = 0
-        for line in lines:
-            if line.find(search_string) is not -1:
-                lines.insert(i + 1, new_string)
+import sys
+
+
+if __name__ == "__main__":
+    size = [0]
+    codes = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
+
+    def check_match(line):
+        '''Checks for regexp match in line.'''
+        try:
+            line = line[:-1]
+            words = line.split(" ")
+            size[0] += int(words[-1])
+            code = int(words[-2])
+            if code in codes:
+                codes[code] += 1
+        except:
+            pass
+
+    def print_stats():
+        '''Prints accumulated statistics.'''
+        print("File size: {}".format(size[0]))
+        for k in sorted(codes.keys()):
+            if codes[k]:
+                print("{}: {}".format(k, codes[k]))
+    i = 1
+    try:
+        for line in sys.stdin:
+            check_match(line)
+            if i % 10 == 0:
+                print_stats()
             i += 1
-        f.seek(0)
-        f.write("".join(lines))
+    except KeyboardInterrupt:
+        print_stats()
+        raise
+    print_stats()
