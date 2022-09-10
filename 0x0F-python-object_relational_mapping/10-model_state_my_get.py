@@ -1,27 +1,34 @@
 #!/usr/bin/python3
-'''
-a script that lists all State objects
-from the database hbtn_0e_6_usa
-'''
+"""
+prints the State object with the name passed as argument from the database hbtn_0e_6_usa
+takes 4 arguments: mysql username, mysql password, database name and state name to search (SQL injection free)
+"""
 
+import sys
 
-from sys import argv
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.session import Session
+from sqlalchemy.sql.expression import false
 from model_state import Base, State
+from sqlalchemy import create_engine
 
-if __name__ == "__main__":
+
+def my_get():
+    """ defining func """
+
     engine = create_engine(
-            'mysql+mysqldb://{}:{}@localhost/{}'.format(argv[1],
-                                                        argv[2],
-                                                        argv[3]))
-    Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    state = session.query(State).filter_by(name=argv[4]).first()
-    if state is not None:
-            print(str(state.id))
-    else:
+        'mysql+mysqldb://{}:{}@localhost:3306/{}'.format(sys.argv[1], sys.argv[2], sys.argv[3]), pool_pre_ping=True)
+    session = Session(engine)
+
+    state_name = sys.argv[4]
+    found = False
+
+    for state in session.query(State):
+            if state.name == state_name:
+                print(f'{state.id}')
+                found = True
+                break
+    if found is False:
         print("Not found")
-    session.close()
+
+if __name__ == '__main__':
+    my_get()
