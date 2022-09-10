@@ -1,34 +1,37 @@
 #!/usr/bin/python3
 """
-prints the State object with the name passed as argument from the database hbtn_0e_6_usa
-takes 4 arguments: mysql username, mysql password, database name and state name to search (SQL injection free)
+    A script that prints the State object with the name passed as an argument
+    from hbtn_0e_6_usa
+    Username, password, dbname and name to search
+    will be passed as arguments to the script.
 """
 
-import sys
 
-from sqlalchemy.orm.session import Session
-from sqlalchemy.sql.expression import false
+import sys
 from model_state import Base, State
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
-
-def my_get():
-    """ defining func """
-
-    engine = create_engine(
-        'mysql+mysqldb://{}:{}@localhost:3306/{}'.format(sys.argv[1], sys.argv[2], sys.argv[3]), pool_pre_ping=True)
-    session = Session(engine)
-
-    state_name = sys.argv[4]
-    found = False
-
-    for state in session.query(State):
-            if state.name == state_name:
-                print(f'{state.id}')
-                found = True
-                break
-    if found is False:
-        print("Not found")
-
 if __name__ == '__main__':
-    my_get()
+    engine = create_engine('mysql+mysqldb://{}:{}@localhost:3306/{}'.format(
+                           sys.argv[1], sys.argv[2], sys.argv[3]),
+                           pool_pre_ping=True)
+
+    Session = sessionmaker(bind=engine)
+
+    Base.metadata.create_all(engine)
+
+    # create a session
+    session = Session()
+
+    # extract first state
+    states = session.query(State) \
+                    .filter(State.name == sys.argv[4]).one_or_none()
+
+    # print state.id
+    if states is None:
+        print("Not found")
+    else:
+        print(states.id)
+
+    session.close()
