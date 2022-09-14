@@ -1,21 +1,21 @@
 #!/usr/bin/python3
+"""Defines a city model
+    Inherits from the SQLAlchemy Base and links to the MYSQL cities table.
 """
-State class:
-	inherits from Base Tips
-	links to the MySQL table states
-	attributes:
-		id that represents a column of an auto-generated, unique integer, can’t be null and is a primary key
-		name that represents a column of a string with maximum 128 characters and can’t be null
-"""
-
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
+
 
 Base = declarative_base()
 
-class State(Base):
-    """ defining class """
 
-    __tablename__ = 'states'
-    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+class City(Base):
+    """ Represents a city for a MYSQL database.
+    id (sqlalchemy.Integer): The cities id.
+    name (sqlalchemy.String): The name of the city.
+    state_id(sqlalchemy,Integer): Foreign key to states_id
+    """
+    __tablename__ = "cities"
+    id = Column(Integer, primary_key=True)
     name = Column(String(128), nullable=False)
+    state_id = Column(Integer, ForeignKey("states_id"), nullable=False)
